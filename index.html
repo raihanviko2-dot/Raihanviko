@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Neon Share</title>
+
+<style>
+  body {
+    margin: 0;
+    background: black;
+    overflow: hidden;
+    font-family: Arial;
+  }
+
+  canvas {
+    display: block;
+  }
+
+  /* TEXT */
+  .text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ff4d4d;
+    font-size: 26px;
+    text-align: center;
+
+    text-shadow:
+      0 0 10px red,
+      0 0 20px red,
+      0 0 40px red;
+
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  /* BUTTON */
+  .buttons {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 20px;
+    background: #25D366;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .btn.messenger {
+    background: #0084FF;
+  }
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="text" id="text"></div>
+
+<div class="buttons">
+  <button class="btn" onclick="shareWhatsApp()">Share WhatsApp</button>
+  <button class="btn messenger" onclick="shareMessenger()">Share Messenger</button>
+</div>
+
+<script>
+  // FULLSCREEN AUTO
+  document.body.addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    }
+  });
+
+  // CANVAS LOVE
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let particles = [];
+  const total = 800;
+
+  function heartFunction(t) {
+    let x = 16 * Math.pow(Math.sin(t), 3);
+    let y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+    return { x, y };
+  }
+
+  for (let i = 0; i < total; i++) {
+    let t = Math.random() * Math.PI * 2;
+    let pos = heartFunction(t);
+
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      targetX: canvas.width/2 + pos.x * 15,
+      targetY: canvas.height/2 + pos.y * 15
+    });
+  }
+
+  function animate() {
+    ctx.fillStyle = "rgba(0,0,0,0.1)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach(p => {
+      p.x += (p.targetX - p.x) * 0.02;
+      p.y += (p.targetY - p.y) * 0.02;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+
+      ctx.shadowColor = "red";
+      ctx.shadowBlur = 15;
+
+      ctx.fillStyle = "#ff2a2a";
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+
+  // TYPING TEXT
+  const text = " i love u semua anak x3 ";
+  let index = 0;
+  const speed = 80;
+  const textElement = document.getElementById("text");
+
+  function typeEffect() {
+    if (index < text.length) {
+      textElement.innerHTML += text.charAt(index);
+      index++;
+      setTimeout(typeEffect, speed);
+    }
+  }
+
+  typeEffect();
+
+  // SHARE
+  function shareWhatsApp() {
+    let url = window.location.href;
+    window.open(`https://wa.me/?text=${encodeURIComponent("Lihat ini 💖 " + url)}`);
+  }
+
+  function shareMessenger() {
+    let url = window.location.href;
+    window.open(`https://www.facebook.com/dialog/send?link=${url}`);
+  }
+</script>
+
+</body>
+</html>
